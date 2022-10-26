@@ -5,6 +5,7 @@ import {
   deleteQuote,
   getAllQuotes,
   getOneQuote,
+  searchQuotes,
   updateQuote,
 } from './handlers/quote';
 import { handleInputErrors } from './modules/middleware';
@@ -17,6 +18,8 @@ const router = Router();
 router.get('/quote', getAllQuotes);
 
 router.get('/quote/:id', getOneQuote);
+
+router.get('/quote/:query', searchQuotes);
 
 router.post(
   '/quote',

@@ -1,5 +1,8 @@
 import prisma from '../db';
 
+/**
+ * CRUD
+ */
 export const getAllQuotes = async (req, res) => {
   const user = await prisma.user.findUnique({
     where: {
@@ -104,4 +107,25 @@ export const deleteQuote = async (req, res, next) => {
   } catch (e) {
     next(e);
   }
+};
+
+/**
+ * Querying
+ */
+
+export const searchQuotes = async (req, res) => {
+  const results = await prisma.quote.findMany({
+    where: {
+      OR: [
+        {
+          text: { contains: req.params.query },
+        },
+        {
+          authorName: { contains: req.params.query },
+        },
+      ],
+    },
+  });
+
+  console.log('results:', results);
 };

@@ -1,4 +1,3 @@
-import path from 'path';
 import express from 'express';
 import morgan from 'morgan';
 import { createNewUser, signin } from './handlers/user';

@@ -29,8 +29,8 @@ model Quote {
   author     Author @relation(fields: [authorName], references: [name])
   authorName String
 
-  @@unique([id, createdByUserId])
   @@unique([authorName, text])
+  @@unique([id, createdByUserId])
 }
 
 model Author {
