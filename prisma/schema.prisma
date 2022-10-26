@@ -25,9 +25,16 @@ model Quote {
   createdBy       User   @relation(fields: [createdByUserId], references: [id])
   createdByUserId String
 
-  author String
-  text   String
+  text       String
+  author     Author @relation(fields: [authorName], references: [name])
+  authorName String
 
   @@unique([id, createdByUserId])
-  @@unique([author, text])
+  @@unique([authorName, text])
+}
+
+model Author {
+  id     String  @id @default(uuid())
+  name   String  @unique
+  quotes Quote[]
 }

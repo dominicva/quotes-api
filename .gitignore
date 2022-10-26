@@ -2,6 +2,5 @@ node_modules
 .env
 .DS_Store
 
-# temp html file
-index.html
+
 

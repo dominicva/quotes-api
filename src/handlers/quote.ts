@@ -30,9 +30,19 @@ export const createQuote = async (req, res, next) => {
   try {
     const quote = await prisma.quote.create({
       data: {
-        createdByUserId: req.user.id,
         text: req.body.text,
-        author: req.body.author,
+        createdBy: {
+          connect: {
+            username: req.user.username,
+          },
+        },
+        author: {
+          // connect to author if already exists, otherwise create a new one
+          connectOrCreate: {
+            where: { name: req.body.author },
+            create: { name: req.body.author },
+          },
+        },
       },
     });
 
