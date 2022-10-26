@@ -26,17 +26,11 @@ export const getOneQuote = async (req, res) => {
   res.json({ data: quote });
 };
 
-export const createQuote = async (req, res) => {
+export const createQuote = async (req, res, next) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: {
-        username: req.user.username,
-      },
-    });
-
     const quote = await prisma.quote.create({
       data: {
-        createdByUserId: user.id,
+        createdByUserId: req.user.id,
         text: req.body.text,
         author: req.body.author,
       },
@@ -44,12 +38,11 @@ export const createQuote = async (req, res) => {
 
     res.status(201).json({ data: quote });
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: 'unable to create new quote' });
+    next(e);
   }
 };
 
-export const updateQuote = async (req, res) => {
+export const updateQuote = async (req, res, next) => {
   const { text, author } = req.body;
 
   let data;
@@ -82,20 +75,23 @@ export const updateQuote = async (req, res) => {
 
     res.status(201).json({ data: updatedQuote });
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: 'unable to update quote' });
+    next(e);
   }
 };
 
-export const deleteQuote = async (req, res) => {
-  const deletedQuote = await prisma.quote.delete({
-    where: {
-      id_createdByUserId: {
-        id: req.params.id,
-        createdByUserId: req.user.id,
+export const deleteQuote = async (req, res, next) => {
+  try {
+    const deletedQuote = await prisma.quote.delete({
+      where: {
+        id_createdByUserId: {
+          id: req.params.id,
+          createdByUserId: req.user.id,
+        },
       },
-    },
-  });
+    });
 
-  res.status(200).json({ data: deletedQuote });
+    res.status(200).json({ data: deletedQuote });
+  } catch (e) {
+    next(e);
+  }
 };

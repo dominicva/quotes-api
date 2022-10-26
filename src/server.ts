@@ -19,4 +19,22 @@ app.use('/api', protect, router);
 app.post('/user', createNewUser);
 app.post('/signin', signin);
 
+app.use((err, _req, res, _next) => {
+  console.error('Error message:', err.message);
+
+  if (err.meta) {
+    console.error('Cause:', err.meta.cause);
+  }
+
+  if (err.type === 'auth') {
+    res.status(401).json({ message: 'unauthorized' });
+  } else if (err.type === 'username taken') {
+    res.status(400).json({ message: 'username already taken' });
+  } else if (err.type === 'input') {
+    res.status(400).json({ message: 'invalid input' });
+  } else {
+    res.status(500).json({ message: "oops, that's on us" });
+  }
+});
+
 export default app;
