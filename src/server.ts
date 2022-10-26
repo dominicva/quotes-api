@@ -1,3 +1,4 @@
+import path from 'path';
 import express from 'express';
 import morgan from 'morgan';
 import { createNewUser, signin } from './handlers/user';
@@ -10,8 +11,8 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
-  res.status(200).json({ message: 'hello world' });
+app.get('/', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.use('/api', protect, router);

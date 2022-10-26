@@ -29,6 +29,7 @@ router.post(
 router.put(
   '/quote/:id',
   body('text').custom((value, { req }) => {
+    // workaround to ensure at least one of text or author fields included
     return value || req.body.author;
   }),
   handleInputErrors,
