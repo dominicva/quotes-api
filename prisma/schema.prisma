@@ -29,4 +29,5 @@ model Quote {
   text   String
 
   @@unique([id, createdByUserId])
+  @@unique([author, text])
 }
