@@ -1,4 +1,15 @@
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+
+// on signin
+export const comparePasswords = (plainTextPassword, hashedPassword) => {
+  return bcrypt.compare(plainTextPassword, hashedPassword);
+};
+
+// on signup
+export const hashPassword = plainTextPassword => {
+  return bcrypt.hash(plainTextPassword, Number(process.env.SALT));
+};
 
 export const createJWT = user => {
   const token = jwt.sign(
@@ -13,19 +24,16 @@ export const createJWT = user => {
 };
 
 export const protect = (req, res, next) => {
-  // do we need thse return statements?
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    res.status(401).json({ message: 'not authorized' });
-    return;
+    return res.status(401).json({ message: 'authorization not provided' });
   }
 
   const [, token] = authHeader.split(' ');
 
   if (!token) {
-    res.status(401).json({ message: 'token provided incorrectly' });
-    return;
+    return res.status(401).json({ message: 'not authorized' });
   }
 
   try {
@@ -34,7 +42,6 @@ export const protect = (req, res, next) => {
     next();
   } catch (e) {
     console.error(e);
-    res.status(401).json({ message: 'invalid token' });
-    return;
+    return res.status(401).json({ message: 'invalid token' });
   }
 };

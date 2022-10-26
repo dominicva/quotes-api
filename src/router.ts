@@ -1,37 +1,40 @@
 import { Router } from 'express';
+import { body } from 'express-validator';
+import {
+  createQuote,
+  deleteQuote,
+  getAllQuotes,
+  getOneQuote,
+  updateQuote,
+} from './handlers/quote';
+import { handleInputErrors } from './modules/middleware';
 
 const router = Router();
 
 /**
  * Quote
  */
+router.get('/quote', getAllQuotes);
 
-router.get('/quote', (req, res) => {
-  res.status(200).json({ message: 'get all quotes' });
-});
+router.get('/quote/:id', getOneQuote);
 
-router.get('/quote/:id', (req, res) => {
-  res.status(200).json({ message: `get quote with id: ${req.params.id}` });
-});
+router.post(
+  '/quote',
+  body('text').exists(),
+  body('author').exists(),
+  handleInputErrors,
+  createQuote
+);
 
-const createQuote = (req, res) => {
-  console.log('req.body:', req.body);
-  // const { text, author } = req.body;
-  res.status(200).json({ message: 'create quote' });
-};
+router.put(
+  '/quote/:id',
+  body('text').custom((value, { req }) => {
+    return value || req.body.author;
+  }),
+  handleInputErrors,
+  updateQuote
+);
 
-router.post('/quote', createQuote);
-
-// (req, res) => {
-//   res.status(200).json({ message: 'create quote' });
-// }
-
-router.put('/quote/:id', (req, res) => {
-  res.status(200).json({ message: `update quote with id: ${req.params.id}` });
-});
-
-router.delete('/quote/:id', (req, res) => {
-  res.status(200).json({ message: `delete quote with id: ${req.params.id}` });
-});
+router.delete('/quote/:id', deleteQuote);
 
 export default router;

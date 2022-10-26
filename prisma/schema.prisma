@@ -21,9 +21,12 @@ model User {
 model Quote {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
-  text      String
-  author    String
 
   createdBy       User   @relation(fields: [createdByUserId], references: [id])
   createdByUserId String
+
+  author String
+  text   String
+
+  @@unique([id, createdByUserId])
 }
