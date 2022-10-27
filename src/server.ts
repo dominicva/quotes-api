@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import { createNewUser, signin } from './handlers/user';
 import { protect } from './modules/auth';
@@ -7,7 +8,13 @@ import router from './router';
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  })
+);
+app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -25,7 +32,7 @@ app.use((err, _req, res, _next) => {
   console.error('Error message:', err.message);
 
   if (err.meta) {
-    console.error('Cause:', err.meta.cause);
+    console.error('Error meta:', err.meta);
   }
 
   if (err.type === 'auth') {

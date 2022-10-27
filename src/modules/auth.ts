@@ -24,13 +24,14 @@ export const createJWT = user => {
 };
 
 export const protect = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  const accessToken = req.cookies.access_token;
 
-  if (!authHeader) {
+  if (!accessToken) {
     return res.status(401).json({ message: 'authorization not provided' });
   }
 
-  const [, token] = authHeader.split(' ');
+  // 'Bearer <token>' -> '<token>'
+  const [, token] = accessToken.split(' ');
 
   if (!token) {
     return res.status(401).json({ message: 'not authorized' });

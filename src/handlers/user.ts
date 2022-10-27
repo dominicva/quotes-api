@@ -11,7 +11,15 @@ export const createNewUser = async (req, res, next) => {
     });
 
     const token = createJWT(user);
-    res.json({ token });
+
+    res
+      .status(201)
+      .cookie('access_token', `Bearer ${token}`, {
+        // cookie removed after 1 hour
+        expires: new Date(Date.now() + 3600000),
+        httpOnly: true,
+      })
+      .json({ data: user });
   } catch (e) {
     if (e.code === 'P2002') {
       e.type = 'username taken';
