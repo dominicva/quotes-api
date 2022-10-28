@@ -17,11 +17,9 @@ export const getAllQuotes = async (req, res) => {
 };
 
 export const getOneQuote = async (req, res) => {
-  const { id } = req.params;
-
   const quote = await prisma.quote.findFirst({
     where: {
-      id,
+      id: req.params.id,
       createdByUserId: req.user.id,
     },
   });
@@ -51,6 +49,7 @@ export const createQuote = async (req, res, next) => {
 
     res.status(201).json({ data: quote });
   } catch (e) {
+    console.log('create quote error:', e.code, e.meta);
     next(e);
   }
 };

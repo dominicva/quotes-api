@@ -29,27 +29,13 @@ app.use('/api', protect, router);
 app.post('/user', validateUsernameAndPassword, createNewUser);
 app.post('/signin', signin);
 
-app.use((err, _req, res, _next) => {
-  console.error('Error message:', err.message);
+app.use((error, _req, res, _next) => {
+  console.error('Error:', error);
 
-  let msg;
-
-  if (Array.isArray(err.meta)) {
-    msg = err.meta
-      .filter(
-        ({ msg }) => msg.startsWith('username') || msg.startsWith('password')
-      )
-      .map(({ msg }) => msg);
-  }
-
-  if (err.type === 'auth') {
-    res.status(401).json({ message: 'unauthorized' });
-  } else if (err.type === 'username') {
-    res.status(400).json({ message: 'username already taken' });
-  } else if (err.type === 'input') {
-    res.status(400).json({ message: msg || 'invalid input' });
+  if (error) {
+    res.status(400).json({ error: error });
   } else {
-    res.status(500).json({ message: "oops, that's on us" });
+    res.status(500).json({ error: "oops, that's on us" });
   }
 });
 

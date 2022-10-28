@@ -23,28 +23,38 @@ export const createNewUser = async (req, res, next) => {
       })
       .json({ data: user });
   } catch (e) {
-    if (e.code === 'P2002') {
-      e.type = 'username';
-    } else {
-      e.type = 'input';
-    }
-    next(e);
+    console.log('e:', e);
+    // const err = { type: 'username', message: 'username already taken' };
+
+    // if (e.code === 'P2002') {
+    //   e.type = 'username';
+    // } else {
+    //   e.type = 'input';
+    // }
+    next({ type: 'username', message: 'username already taken' });
   }
 };
 
-export const signin = async (req, res) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      username: req.body.username,
-    },
-  });
+export const signin = async (req, res, next) => {
+  const error = { type: 'auth', message: 'invalid username or password' };
 
-  const isValid = await comparePasswords(req.body.password, user.password);
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        username: req.body.username,
+      },
+    });
 
-  if (!isValid) {
-    return res.status(401).json({ message: 'invalid password' });
+    const isValid = await comparePasswords(req.body.password, user.password);
+
+    if (!isValid) {
+      return next(error);
+    }
+
+    const token = createJWT(user);
+    res.json({ token });
+  } catch (e) {
+    console.error(e);
+    next(error);
   }
-
-  const token = createJWT(user);
-  res.json({ token });
 };

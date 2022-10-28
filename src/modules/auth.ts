@@ -23,27 +23,19 @@ export const createJWT = user => {
   return token;
 };
 
-export const protect = (req, res, next) => {
-  const accessToken = req.cookies.access_token;
-
-  if (!accessToken) {
-    return res.status(401).json({ message: 'authorization not provided' });
-  }
-
-  // 'Bearer <token>' -> '<token>'
-  const [, token] = accessToken.split(' ');
-
-  if (!token) {
-    return res.status(401).json({ message: 'not authorized' });
-  }
-
+export const protect = (req, _res, next) => {
   try {
+    const accessToken = req.cookies.access_token;
+
+    // 'Bearer <token>' -> '<token>'
+    const [, token] = accessToken.split(' ');
+
     const user = jwt.verify(token, process.env.JWT_SECRET);
     // success -> augment req object with authorized user
     req.user = user;
     next();
   } catch (e) {
-    e.type = 'auth';
-    next(e);
+    console.error('Error in protect middleware', e);
+    next({ type: 'auth', msg: 'not authorized' });
   }
 };

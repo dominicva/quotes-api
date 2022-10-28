@@ -1,13 +1,15 @@
 import { body, validationResult } from 'express-validator';
 
 export const handleInputErrors = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const e = new Error('Invalid input');
-    // @ts-ignore-next-line
-    e.type = 'input';
-    // @ts-ignore-next-line
-    e.meta = errors.array();
+  const errors = validationResult(req).array();
+
+  if (errors.length > 0) {
+    const e = errors
+      .filter(({ msg }) => msg !== 'Invalid value')
+      .map(({ value, msg, param }) => {
+        return { type: 'input', value: value || '', msg, field: param };
+      });
+
     next(e);
   } else {
     next();
