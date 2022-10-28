@@ -30,9 +30,8 @@ app.post('/user', validateUsernameAndPassword, createNewUser);
 app.post('/signin', signin);
 
 app.use((error, _req, res, _next) => {
-  console.error('Error:', error);
-
   if (error) {
+    console.error('Error:', error);
     res.status(400).json({ error: error });
   } else {
     res.status(500).json({ error: "oops, that's on us" });
