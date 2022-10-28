@@ -23,20 +23,15 @@ export const createNewUser = async (req, res, next) => {
       })
       .json({ data: user });
   } catch (e) {
-    console.log('e:', e);
-    // const err = { type: 'username', message: 'username already taken' };
-
-    // if (e.code === 'P2002') {
-    //   e.type = 'username';
-    // } else {
-    //   e.type = 'input';
-    // }
-    next({ type: 'username', message: 'username already taken' });
+    next({
+      type: 'username',
+      msg: 'Username taken. If you already have an account, login instead.',
+    });
   }
 };
 
 export const signin = async (req, res, next) => {
-  const error = { type: 'auth', message: 'invalid username or password' };
+  const error = { type: 'auth', msg: 'Invalid username or password' };
 
   try {
     const user = await prisma.user.findUnique({
@@ -52,7 +47,19 @@ export const signin = async (req, res, next) => {
     }
 
     const token = createJWT(user);
-    res.json({ token });
+    res
+      .status(201)
+      .cookie('access_token', `Bearer ${token}`, {
+        // cookie removed after 1 hour
+        expires: new Date(Date.now() + 3600000),
+        httpOnly: true,
+      })
+      .json({
+        data: {
+          username: user.username,
+          signedInAt: new Date().toLocaleString(),
+        },
+      });
   } catch (e) {
     console.error(e);
     next(error);

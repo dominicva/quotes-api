@@ -33,7 +33,7 @@ const passwordValidator = body('password')
     return /\d/.test(value) && !/\s/.test(value);
   })
   .withMessage(
-    'password must be 6-20 characters long and contain at least one number'
+    'password must be 6-20 characters long, contain at least one number and no spaces'
   );
 
 export const validateUsernameAndPassword = [
